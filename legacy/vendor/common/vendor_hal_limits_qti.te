@@ -1,4 +1,4 @@
-# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+# Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,29 +25,18 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+type vendor_hal_limits_qti, domain;
+hal_server_domain(vendor_hal_limits_qti, vendor_hal_limits)
 
-type vendor_poweroptservice, domain;
-type vendor_poweroptservice_exec, exec_type, vendor_file_type, file_type;
+# Allow hwbinder call from hal client to server and vice-versa
+binder_call(vendor_hal_limits_client, vendor_hal_limits_server)
+binder_call(vendor_hal_limits_server, vendor_hal_limits_client)
 
-init_daemon_domain(vendor_poweroptservice)
+# Allow hwservice related rules
+hal_attribute_hwservice(vendor_hal_limits, vendor_hal_limits_hwservice)
 
-hwbinder_use(vendor_poweroptservice)
+type vendor_hal_limits_qti_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_hal_limits_qti)
 
-hal_client_domain(vendor_poweroptservice, vendor_hal_perf)
-hal_client_domain(vendor_poweroptservice, hal_graphics_composer)
-
-get_prop(vendor_poweroptservice, vendor_mpctl_prop)
-get_prop(vendor_poweroptservice, vendor_display_prop)
-
-
-
-r_dir_file(vendor_poweroptservice, vendor_sysfs_graphics)
-r_dir_file(vendor_poweroptservice, vendor_sysfs_kgsl)
-r_dir_file(vendor_poweroptservice, sysfs_android_usb)
-
-allow vendor_poweroptservice vendor_qdisplay_service:service_manager find;
-allow vendor_poweroptservice input_device:dir r_dir_perms;
-allow vendor_poweroptservice input_device:chr_file rw_file_perms;
-
-allow vendor_poweroptservice vendor_pm_data_file:dir create_dir_perms;
-allow vendor_poweroptservice vendor_pm_data_file:file create_file_perms;
+# Allow access to thermal hal
+hal_client_domain(vendor_hal_limits_qti, hal_thermal)
